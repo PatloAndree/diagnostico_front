@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Pressable,
   Image,
-  ImageBackground,
   ToastAndroid,
   BackHandler,
   Alert,
@@ -17,7 +16,7 @@ import {LoginS} from '../../shared/Estilos';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useIsFocused} from '@react-navigation/native';
-import axios from '../api/axios';
+// import axios from '../api/axios';
 
 const Login = ({navigation}) => {
 
@@ -45,7 +44,18 @@ const Login = ({navigation}) => {
     setIsFocusedPassword(false);
   };
 
-  const fnValidarLogin = async () => {
+  const fnValidarLogin = () => {
+    navigation.navigate('Inicio', {
+      nombreUsuario: 'Invitado',
+      nombreCompleto: 'Usuario de demostracion',
+      id_usuario: null,
+      correo: miusuario,
+      rolUsuario: 'Invitado',
+    });
+  };
+
+  /* Login con API desactivado temporalmente para la presentacion.
+  const fnValidarLoginConApi = async () => {
     setAcceder(true);
     if (miusuario.trim() == '' && password.trim() == '') {
       ToastAndroid.showWithGravity(
@@ -140,6 +150,8 @@ const Login = ({navigation}) => {
     }
   };
 
+  */
+
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [rightIcon, setRightIcon] = useState('eye');
   const handlePasswordVisibility = () => {
@@ -168,11 +180,9 @@ const Login = ({navigation}) => {
 
   useEffect(
     () => {
-      if (focus == true) {
-        BackHandler.addEventListener("hardwareBackPress", exitToApp);
-      }
-      return () =>  
-        BackHandler.removeEventListener("hardwareBackPress", exitToApp);
+      if (!focus) return;
+      const subscription = BackHandler.addEventListener("hardwareBackPress", exitToApp);
+      return () => subscription.remove();
     },
 
     [focus],
@@ -184,6 +194,12 @@ const Login = ({navigation}) => {
     handlePasswordVisibility,
     (
     <View style={LoginS.container}>
+      <View style={LoginS.container_fondo}>
+        <Image
+          source={require('../../assets/tdh.jpg')}
+          resizeMode="cover"
+          style={LoginS.imagen_fondo}
+        />
         <View style={LoginS.container_div}>
           <View style={LoginS.container_div_head}>
             {/* <Text style={{fontWeight: '800', color: 'white', fontSize: 40}}>
@@ -288,6 +304,7 @@ const Login = ({navigation}) => {
             www.Johanlcconstructora.com
           </Text>
         </View>
+      </View>
     </View>
     )
   );

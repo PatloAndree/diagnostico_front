@@ -27,6 +27,17 @@ const general = {
 };
 
 const LoginS = StyleSheet.create({
+  container_fondo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  imagen_fondo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: width,
+    height: height * 0.9,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FEFAF6',
