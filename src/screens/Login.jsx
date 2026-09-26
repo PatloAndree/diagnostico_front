@@ -15,13 +15,14 @@ import {ActivityIndicator} from 'react-native-paper';
 import {LoginS} from '../../shared/Estilos';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useIsFocused} from '@react-navigation/native';
-// import axios from '../api/axios';
+import axios from '../api/axios';
 
 const Login = ({navigation}) => {
 
-  const [miusuario, setUsuario] = useState('JuanCarlos@gmail.com');
-  const [password, setPass] = useState('12345678');
+  const [miusuario, setUsuario] = useState('juan@gmail.com');
+  const [password, setPass] = useState('123456');
   const [isFocused, setIsFocused] = useState(false);
   const [isFocusedPassword, setIsFocusedPassword] = useState(false);
   
@@ -44,17 +45,51 @@ const Login = ({navigation}) => {
     setIsFocusedPassword(false);
   };
 
-  const fnValidarLogin = () => {
-    navigation.navigate('Inicio', {
-      nombreUsuario: 'Invitado',
-      nombreCompleto: 'Usuario de demostracion',
-      id_usuario: null,
-      correo: miusuario,
-      rolUsuario: 'Invitado',
-    });
+  const fnValidarLogin = async () => {
+    if (!miusuario.trim() || !password.trim()) {
+      ToastAndroid.showWithGravity(
+        'Ingresa usuario y contrasena',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+      return;
+    }
+
+    setAcceder(true);
+    try {
+      const {data} = await axios.post('login', {
+        usuario: miusuario.trim(),
+        contrasenia: password,
+      });
+
+      if (!data?.token || !data?.user) {
+        throw new Error('La respuesta de inicio de sesion es invalida.');
+      }
+
+      axios.defaults.headers.common.Authorization = `${data.token_type || 'Bearer'} ${data.token}`;
+      ToastAndroid.showWithGravity(
+        data.message || 'Inicio de sesion exitoso.',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+      navigation.replace('Inicio', {
+        nombreUsuario: data.user.name?.split(' ')[0] || 'Usuario',
+        nombreCompleto: data.user.name || '',
+        id_usuario: data.user.id,
+        correo: data.user.email || miusuario.trim(),
+        token: data.token,
+      });
+    } catch (error) {
+      const mensaje = error.response?.data?.message ||
+        'No se pudo iniciar sesion. Verifica credenciales y conexion.';
+      console.log('Error de login:', error.response?.data || error.message);
+      ToastAndroid.showWithGravity(mensaje, ToastAndroid.LONG, ToastAndroid.BOTTOM);
+    } finally {
+      setAcceder(false);
+    }
   };
 
-  /* Login con API desactivado temporalmente para la presentacion.
+  
   const fnValidarLoginConApi = async () => {
     setAcceder(true);
     if (miusuario.trim() == '' && password.trim() == '') {
@@ -150,7 +185,7 @@ const Login = ({navigation}) => {
     }
   };
 
-  */
+  
 
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [rightIcon, setRightIcon] = useState('eye');
@@ -196,21 +231,18 @@ const Login = ({navigation}) => {
     <View style={LoginS.container}>
       <View style={LoginS.container_fondo}>
         <Image
-          source={require('../../assets/tdh.jpg')}
+          source={require('../../assets/neuronal.jpg')}
           resizeMode="cover"
           style={LoginS.imagen_fondo}
         />
         <View style={LoginS.container_div}>
           <View style={LoginS.container_div_head}>
-            {/* <Text style={{fontWeight: '800', color: 'white', fontSize: 40}}>
-              Cotiza APP
-            </Text> */}
-            {/* <Image
-              source={require('../../Assets/logo.png')}
-              style={LoginS.size_image}
-            /> */}
-            <Text>
-                APP DIAGNOSTICO TDH
+            <View style={LoginS.login_brand_icon}>
+              <MaterialCommunityIcons name="brain" size={42} color="#FFFFFF" />
+            </View>
+            <Text style={LoginS.login_brand_title}>Mente Escolar</Text>
+            <Text style={LoginS.login_brand_subtitle}>
+              Evaluación y acompañamiento para TDAH
             </Text>
           </View>
 
@@ -220,9 +252,9 @@ const Login = ({navigation}) => {
                 style={[
                   LoginS.container_div_inputs_campos,
                   {
-                    borderColor: isFocused ? '#FFB32E' : '#ffff',
+                    borderColor: isFocused ? '#093eeb' : '#ffff',
                     borderWidth: 1, 
-                    shadowColor: isFocused ? '#FFCD50' : '#000', // Shadow color can be conditional
+                    shadowColor: isFocused ? '#093eeb' : '#000', // Shadow color can be conditional
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: isFocused ? 2 : 0.05, // Shadow opacity can be conditional
                     shadowRadius: 2.84,
@@ -231,7 +263,7 @@ const Login = ({navigation}) => {
                     },
                 ]}>
                 <Text>
-                  <Feather name="user" size={23} color={'#FF9E14'} />
+                  <Feather name="user" size={23} color={'#093eeb'} />
                 </Text>
                 <TextInput
                   placeholder="Correo electronico"
@@ -252,7 +284,7 @@ const Login = ({navigation}) => {
               <View
                 style={[
                   LoginS.container_div_inputs_campos,
-                  {borderColor: isFocusedPassword ? '#FFB32E' : '#ffff',
+                  {borderColor: isFocusedPassword ? '#093eeb' : '#ffff',
                     borderWidth: 1, 
                     shadowColor: isFocusedPassword ? '#FFCD50' : '#000', // Shadow color can be conditional
                     shadowOffset: { width: 0, height: 4 },
@@ -261,7 +293,7 @@ const Login = ({navigation}) => {
                     elevation: isFocusedPassword ? 15 : 0, // Elevation can also be conditional
                   },
                 ]}>
-                <Feather name="lock" size={23} color={'#FF9E14'} />
+                <Feather name="lock" size={23} color={'#093eeb'} />
                 <TextInput
                   placeholder="Contraseña"
                   secureTextEntry={passwordVisibility}
@@ -274,7 +306,7 @@ const Login = ({navigation}) => {
                   defaultValue={password}
                   placeholderTextColor="#7D7C7C"></TextInput>
                   <Pressable onPress={handlePasswordVisibility}>
-                    <Feather name={rightIcon} size={23} color={'#FF9E14'} />
+                    <Feather name={rightIcon} size={23} color={'#093eeb'} />
                   </Pressable>
 
               </View>
@@ -301,7 +333,7 @@ const Login = ({navigation}) => {
                 Búscanos como:
             </Text> */}
           <Text style={{color: '#ffff', fontSize: 15, fontWeight: '600'}}>
-            www.Johanlcconstructora.com
+            Juan Carlos Bances  
           </Text>
         </View>
       </View>
