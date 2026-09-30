@@ -614,7 +614,7 @@ const InicioS = StyleSheet.create({
   welcomeCard: {
     backgroundColor: '#246B88',
     borderRadius: 24,
-    padding: 22,
+    padding: 18,
     overflow: 'hidden',
     shadowColor: '#0B3449',
     shadowOffset: {width: 0, height: 7},
@@ -654,12 +654,14 @@ const InicioS = StyleSheet.create({
     color: '#173B5B',
     fontSize: 17,
     fontWeight: '800',
-    marginTop: 25,
+    marginTop: 18,
     marginBottom: 12,
   },
   actionGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    rowGap: 14,
   },
   actionCard: {
     width: width * 0.415,

@@ -58,7 +58,6 @@ const Inicio = ({navigation}) => {
 
     <ScrollView contentContainerStyle={InicioS.dashboardContent} showsVerticalScrollIndicator={false}>
       <View style={InicioS.welcomeCard}>
-        <View style={InicioS.welcomeIcon}><MaterialCommunityIcons name="brain" size={34} color="#FFFFFF" /></View>
         <Text style={InicioS.welcomeEyebrow}>PANEL DE EVALUACIÓN</Text>
         <Text style={InicioS.welcomeTitle}>Hola, {nombreUsuario}</Text>
         <Text style={InicioS.welcomeText}>Organiza a tus escolares y mantén sus evaluaciones de TDAH al día.</Text>
@@ -66,6 +65,18 @@ const Inicio = ({navigation}) => {
 
       <Text style={InicioS.sectionTitle}>Accesos rápidos</Text>
       <View style={InicioS.actionGrid}>
+        <TouchableOpacity style={InicioS.actionCard} onPress={() => navigation.navigate('Diagnostico')}>
+          <View style={InicioS.actionIcon}><MaterialCommunityIcons name="clipboard-text-outline" size={27} color="#246B88" /></View>
+          <Text style={InicioS.actionTitle}>Diagnóstico</Text>
+          <Text style={InicioS.actionDescription}>Registrar encuesta del paciente</Text>
+          <MaterialIcons name="arrow-forward" size={22} color="#246B88" style={InicioS.actionArrow} />
+        </TouchableOpacity>
+        <TouchableOpacity style={InicioS.actionCard} onPress={() => navigation.navigate('DiagnosticosListado')}>
+          <View style={InicioS.actionIcon}><MaterialCommunityIcons name="clipboard-list-outline" size={27} color="#246B88" /></View>
+          <Text style={InicioS.actionTitle}>Historial</Text>
+          <Text style={InicioS.actionDescription}>Ver diagnósticos realizados</Text>
+          <MaterialIcons name="arrow-forward" size={22} color="#246B88" style={InicioS.actionArrow} />
+        </TouchableOpacity>
         <TouchableOpacity style={[InicioS.actionCard, InicioS.actionPrimary]} onPress={() => navigation.navigate('Listado')}>
           <View style={InicioS.actionIconPrimary}><Feather name="users" size={25} color="#FFFFFF" /></View>
           <Text style={InicioS.actionTitlePrimary}>Pacientes</Text>
