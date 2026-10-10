@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ActivityIndicator, Alert, FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import axios from '../api/axios';
@@ -6,6 +6,19 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const vacio = {institucion_id: '', nombres: '', apellidos: '', documento: '', fecha_nacimiento: ''};
 const lista = data => Array.isArray(data) ? data : data?.data || [];
+
+const Campo = ({titulo, valor, placeholder, keyboardType, onChange, inputRef}) => <View style={styles.field}>
+  <Text style={styles.label}>{titulo}</Text>
+  <TextInput
+    ref={inputRef}
+    value={valor}
+    placeholder={placeholder}
+    keyboardType={keyboardType}
+    style={styles.input}
+    onChangeText={onChange}
+    showSoftInputOnFocus
+  />
+</View>;
 
 const Listado = ({navigation}) => {
   const [pacientes, setPacientes] = useState([]);
@@ -15,6 +28,7 @@ const Listado = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [selectorVisible, setSelectorVisible] = useState(false);
   const [cargando, setCargando] = useState(false);
+  const nombresRef = useRef(null);
   const focus = useIsFocused();
 
   const cargar = useCallback(async () => {
@@ -74,12 +88,6 @@ const Listado = ({navigation}) => {
     }}],
   );
 
-  const Campo = ({titulo, campo, placeholder, keyboardType}) => <View style={styles.field}>
-    <Text style={styles.label}>{titulo}</Text>
-    <TextInput value={formulario[campo]} placeholder={placeholder} keyboardType={keyboardType}
-      style={styles.input} onChangeText={valor => cambiar(campo, valor)} />
-  </View>;
-
   return <View style={styles.container}>
     <View style={styles.header}>
       <TouchableOpacity onPress={() => navigation.goBack()}><MaterialIcons name="arrow-back" size={28} color="#093eeb" /></TouchableOpacity>
@@ -96,20 +104,28 @@ const Listado = ({navigation}) => {
       </View>}
     />}
 
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={() => setVisible(false)}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onShow={() => setTimeout(() => nombresRef.current?.focus(), 150)}
+      onRequestClose={() => setVisible(false)}>
       <View style={styles.overlay}><View style={styles.modal}>
         <View style={styles.modalHeader}><Text style={styles.modalTitle}>{editando ? 'Editar paciente' : 'Nuevo paciente'}</Text><TouchableOpacity onPress={() => setVisible(false)}><MaterialIcons name="close" size={24} color="#555" /></TouchableOpacity></View>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.form}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.form}>
           <View style={styles.field}><Text style={styles.label}>Institución</Text>
             <TouchableOpacity style={styles.select} onPress={() => setSelectorVisible(true)}>
               <View style={styles.selectText}><Text style={institucionSeleccionada ? styles.selectValue : styles.placeholder}>{institucionSeleccionada ? institucionSeleccionada.nombre : 'Selecciona una institución'}</Text>{institucionSeleccionada && <Text style={styles.selectId}>ID: {institucionSeleccionada.id}</Text>}</View>
               <MaterialIcons name="keyboard-arrow-down" size={25} color="#093eeb" />
             </TouchableOpacity>
           </View>
-          <Campo titulo="Nombres" campo="nombres" placeholder="Nombres del escolar" />
-          <Campo titulo="Apellidos" campo="apellidos" placeholder="Apellidos del escolar" />
-          <Campo titulo="Documento" campo="documento" placeholder="Documento" keyboardType="numeric" />
-          <Campo titulo="Fecha de nacimiento" campo="fecha_nacimiento" placeholder="AAAA-MM-DD" />
+          <Campo inputRef={nombresRef} titulo="Nombres" valor={formulario.nombres} placeholder="Nombres del escolar" onChange={valor => cambiar('nombres', valor)} />
+          <Campo titulo="Apellidos" valor={formulario.apellidos} placeholder="Apellidos del escolar" onChange={valor => cambiar('apellidos', valor)} />
+          <Campo titulo="Documento" valor={formulario.documento} placeholder="Documento" keyboardType="numeric" onChange={valor => cambiar('documento', valor)} />
+          <Campo titulo="Fecha de nacimiento" valor={formulario.fecha_nacimiento} placeholder="AAAA-MM-DD" onChange={valor => cambiar('fecha_nacimiento', valor)} />
           <TouchableOpacity style={styles.save} onPress={guardar} disabled={cargando}><Text style={styles.saveText}>{cargando ? 'Guardando...' : 'Guardar paciente'}</Text></TouchableOpacity>
         </ScrollView>
       </View></View>
